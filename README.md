@@ -6,8 +6,8 @@ This repository contains an engine that utilize Carbon Black EDR for boosting it
 ### Engine Capabilities
 
 * [x] Detect DLL sideLoading/SearchOrderHijacking depending on
-  * [ ] DLL Path
-  * [ ] Process Path
+  * [x] DLL Path
+  * [x] Process Path
 
 
 
