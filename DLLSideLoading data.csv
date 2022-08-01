@@ -1,4 +1,4 @@
 ProcessName,ProcessPath,DLLName,DLLPath,Signature,Enabled,ThreatActor,Notes
-calc.exe,"c:\windows\system32\calc.exe, c:\windows\syswow64\calc.exe",Windowscodecs.dll,"c:\windows\system32\WindowsCodecs.dll,c:\windows\syswow64\WindowsCodecs.dll",Microsoft,TRUE,Qbot,
-MpCmdRun.exe,C:\ProgramData\Microsoft\Windows Defender\Platform\*\,mpclient.dll,"C:\Program Files\Windows Defender\MpClient.dll,C:\ProgramData\Microsoft\Windows Defender\Platform\*,C:\Program Files (x86)\Windows Defender\MpClient.dll",Microsoft,TRUE,LockBit,
+calc.exe,"c:\windows\system32\calc.exe,     c:\windows\syswow64\calc.exe",Windowscodecs.dll,"c:\windows\system32\WindowsCodecs.dll,c:\windows\syswow64\WindowsCodecs.dll",Microsoft,TRUE,Qbot,
+MpCmdRun.exe,C:\ProgramData\Microsoft\Windows Defender\Platform\*,mpclient.dll,"C:\Program Files\Windows Defender\MpClient.dll,C:\ProgramData\Microsoft\Windows Defender\Platform\*,C:\Program Files (x86)\Windows Defender\MpClient.dll",Microsoft,TRUE,LockBit,
 Teams.exe,C:\Users\*\AppData\Local\Microsoft\Teams\current\Teams.exe,iphlpapi.dll,"c:\windows\system32\iphlpapi.dll,c:\windows\syswow64\iphlpapi.dll",Microsoft,TRUE,Unknown,

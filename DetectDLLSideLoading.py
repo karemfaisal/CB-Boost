@@ -2,7 +2,7 @@ import Utils
 import DLLSideLoadedClass
 import CBAPIendpoints
 
-def DetetcDLLSideLoading(FilePath, confJson):
+def DetetcDLLSideLoading(FilePath, DetectSideLoadOpetions, confJson):
 
 
     # Create CB headers for all clients
@@ -24,15 +24,40 @@ def DetetcDLLSideLoading(FilePath, confJson):
 
     ## Loop on all configured clients -- No threading
     for client in confJson["Clients"]:
+        # Create CB headers for all clients
+        CB_headers = {
+                'X-Auth-Token': client["API-Key"],
+                'Version': '12.0',
+                'Accept': 'application / json',
+                'Content-Type': 'application / json'
+            }
         if client["Enabled"].upper() == "TRUE":
             for row in csvRows:
                 if row[5].upper() == "TRUE":  # Row[5] is enabled value
                     DLLSideLoaded = DLLSideLoadedClass.DLLSideLoaded(row)
-                    Queries.append(DLLSideLoaded.CheckDLLPath())
-                    ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers[0], client["URL"],
+                    if DetectSideLoadOpetions == "DLLPath":
+                        Queries.append(DLLSideLoaded.CheckDLLPath())
+                        ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
                                                                  DLLSideLoaded.CheckDLLPath())
-                    Results.append(ProcessSearch.Search())
-                    del ProcessSearch
+                        Results.append(ProcessSearch.Search())
+                        del ProcessSearch
+                    elif DetectSideLoadOpetions == "ProcessPath":
+                         Queries.append(DLLSideLoaded.CheckProcessPath())
+                         ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
+                                                                 DLLSideLoaded.CheckProcessPath())
+                         Results.append(ProcessSearch.Search())
+                         del ProcessSearch
+                    else:
+                        Queries.append(DLLSideLoaded.CheckDLLPath())
+                        ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
+                                                                  DLLSideLoaded.CheckDLLPath())
+                        Results.append(ProcessSearch.Search())
+                        del ProcessSearch
+                        Queries.append(DLLSideLoaded.CheckProcessPath())
+                        ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
+                                                                     DLLSideLoaded.CheckProcessPath())
+                        Results.append(ProcessSearch.Search())
+                        del ProcessSearch
 
     return Queries, Results
 

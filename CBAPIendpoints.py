@@ -14,7 +14,11 @@ class ProcessSearch:
         self.CBHeaders = CBHeaders
 
     def Search(self):
-        return requests.request("GET", self.URL + self.apiEndPoint + "q=" + self.query, headers=self.CBHeaders,
+        result = requests.request("GET", self.URL + self.apiEndPoint + "q=" + self.query, headers=self.CBHeaders,
                                 verify=False).json()
+        if "query_syntax_error" in result:
+            print("Query syntax error: " + self.query)
+            return None
+        return result
 
 
