@@ -1,20 +1,30 @@
 # CB-Boost
-This repository contains an engine that utilize Carbon Black EDR for boosting its IR and detection capabilities.
+CB-Boost is a tool utilized Carbon Black API to run Incident response actions, and detection use cases that requires automation.
+
+CB-Boost's detection use cases are not meant to be full detection use cases, but it only contains what requires programmatically analysis of the output of certain use cases. To create a simple use case just do it using watchlists.
+
+CB-Boost's IR capabilities is coming soon!.
 
 
 
-### Engine Capabilities
 
+## Engine Capabilities
+
+### Detection uses cases
 * [x] Detect DLL sideLoading/SearchOrderHijacking depending on
   * [x] DLL Path
   * [x] Process Path
 
+### Incident response
+Coming Soon!
 
 
-### How to use
+
+
+## How it works?
 
 1. Update CB config "CB.conf" with CB EDR data.
-2. Add any additonal data to the DLLSideLoading csv
+2. for DLL Sideloading/SearchOrderHijacking,  Add any additional data to the DLLSideLoading csv file.
 3. run the tool
 
 ```shell
@@ -37,6 +47,7 @@ optional arguments:
                         Path to the output file)
 ```
 
+1. For DLL Sideloading/SearchOrderHijacking detection
 ```shell
 python3 main.py -DSL DLLPath -f "DLLSideLoading data.csv" -c "CB.conf" -o "output-DLLSearOrderHijacking.csv"
 ```
