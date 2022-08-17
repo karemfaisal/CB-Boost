@@ -7,8 +7,8 @@ def DetetcDLLSideLoading(DLLrules, DetectSideLoadOpetions, profiles):
 
     # Read Data of DLL sideloading
     dllRules = Utils.getFilePathsRecursively(DLLrules, "yml")
-    Data = Utils.getYamlFromFile("I:\\GIT\\CB-Boost\\HijackLibs\\yml\\microsoft\\built-in\\activeds.yml")
 
+    print("\n{} Rules are getting parsed!, Please wait".format(len(dllRules)))
     # Prepare CB EDR queries
     Results = []
     Queries = []
@@ -41,9 +41,11 @@ def DetetcDLLSideLoading(DLLrules, DetectSideLoadOpetions, profiles):
                 del DllHijackRule
                 gc.collect()
     del cb
+    print("\n{} Queries are prepared!".format(len(Results)))
     return Queries, Results
 
 def Output(Results, outputPath):
+
     TotalResults = 0
     outputCSVHeader = ['DateTime', 'Sensorid', 'UserName', 'Uniqueid', 'ProcessPath', 'cmdline', 'ProcessMd5',
                        'ParentName', 'ParentMd5', 'ID in DataSheet']
@@ -52,6 +54,7 @@ def Output(Results, outputPath):
 
     for i in range(len(Results)):
         TotalResults += len(Results[i])
+        if i%5 == 0 : print("{} Queries are executed!".format(i+1))
         for j in range(len(Results[i])):
             Rows.append([Results[i][j].start.strftime("%m/%d/%Y, %H:%M:%S"), str(Results[i][j].sensor_id),
                             Results[i][j].username, Results[i][j].unique_id,
@@ -62,5 +65,5 @@ def Output(Results, outputPath):
             Rows.clear()
 
 
-    print("Total Processed Queries: " + str(len(Results)))
+    print("\nTotal Processed Queries: " + str(len(Results)))
     print("Total Finding: " + str(TotalResults))

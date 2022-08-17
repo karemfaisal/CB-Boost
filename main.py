@@ -19,7 +19,6 @@ parser.add_argument("-o", "--output",
                     help="Path to the output file)")
 args = parser.parse_args()
 
-Data = Utils.getYamlFromFile("I:\\GIT\\CB-Boost\\HijackLibs\\yml\\microsoft\\built-in\\activeds.yml")
 # Get clients info
 profiles = []
 if args.profiles == None:

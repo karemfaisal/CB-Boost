@@ -32,6 +32,5 @@ def getYamlFromFile(filePath):
         return yaml.safe_load(file.read())
 
 def getFilePathsRecursively(folderPath, extension):
-    if not folderPath.endswith("\\"):
-        folderPath = folderPath + "\\"
-    return list(glob.iglob(folderPath + '**/*.' + extension, recursive=True))
+    print("\nRules Path: " + os.path.join(folderPath, '**\*.') + extension)
+    return list(glob.iglob(os.path.join(folderPath, '**/*.') + extension, recursive=True))
