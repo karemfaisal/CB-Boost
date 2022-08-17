@@ -11,21 +11,38 @@ CB-Boost's IR capabilities is coming soon!.
 ## Engine Capabilities
 
 ### Detection uses cases
-* [x] Detect DLL sideLoading/SearchOrderHijacking depending on
-  * [x] DLL Path
-  * [x] Process Path
+* [x] Detect DLL Hijacking [sideLoading/OrderHijacking].
+  * [x] Integration with [HijackLibs](https://github.com/wietze/HijackLibs)
+  * [x] Detection Based on the DLL Path
+  * [x] Detection Based on The Process Path (not recommended)
+
 
 ### Incident response
-Coming Soon!
 
-
+- [ ] Upload & Run executables and retrieve the output. 
 
 
 ## How it works?
 
-1. Update CB config "CB.conf" with CB EDR data.
-2. for DLL Sideloading/SearchOrderHijacking,  Add any additional data to the DLLSideLoading csv file.
-3. run the tool
+1. ``` git clone --recurse-submodules https://github.com/karemfaisal/CB-Boost```
+
+2. ```pip install -r requirements```
+
+3. ```cbapi-response configure```
+
+   - Will promote you to enter the your CB-EDR Data [URI, Token, Profile Name]
+
+   - cbapi-response could be found in the venv path or pip's scripts' path
+
+**For DLLHijacking detection**
+
+4. Point to the folder contains HijackLibs rules or minimal rules that you want to search for.
+
+   ``` bash
+   python3 main.py -DDH DLLPath --DLLrules ".\HijackLibs\yml\microsoft\built-in" -o "output-DLLSearOrderHijacking.csv"
+   ```
+
+   
 
 ```shell
 python3 main.py -h
@@ -33,22 +50,19 @@ python3 main.py -h
 
 ```shell
 [*Output]
-usage: main.py [-h] [-DSL {DLLPath,ProcessPath,All}] [-f FILE] [-c CONFIG]
-               [-o OUTPUT]
+usage: main.py [-h] [-DDH {DLLPath,ProcessPath,All}] [-f FILE] [-dr DLLRULES]
+               [-p PROFILES] [-o OUTPUT]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -DSL {DLLPath,ProcessPath,All}, --DetectSideLoad {DLLPath,ProcessPath,All}
+  -DDH {DLLPath,ProcessPath,All}, --DetectDllHijack {DLLPath,ProcessPath,All}
                         Detect DLL SideLoading/OrderHijacking attempts
   -f FILE, --file FILE  Path to the file used
-  -c CONFIG, --config CONFIG
-                        Path to the CB EDR's config file - default (CB.conf)
+  -dr DLLRULES, --DLLrules DLLRULES
+                        Path to DLLHijack rules folder
+  -p PROFILES, --profiles PROFILES
+                        profiles name for running the API separated by , ex:
+                        Karem,Ali
   -o OUTPUT, --output OUTPUT
                         Path to the output file)
 ```
-
-1. For DLL Sideloading/SearchOrderHijacking detection
-```shell
-python3 main.py -DSL DLLPath -f "DLLSideLoading data.csv" -c "CB.conf" -o "output-DLLSearOrderHijacking.csv"
-```
-
