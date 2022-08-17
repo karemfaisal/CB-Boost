@@ -1,90 +1,67 @@
 import Utils
-import DLLSideLoadedClass
+import DllHijackRuleClass
 import CBAPIendpoints
+from cbapi.response import *
+import gc
+def DetetcDLLSideLoading(DLLrules, DetectSideLoadOpetions, profiles):
 
-def DetetcDLLSideLoading(FilePath, DetectSideLoadOpetions, confJson):
-
-
-    # Create CB headers for all clients
-    CB_headers = [
-        {
-            'X-Auth-Token': confJson["Clients"][x]["API-Key"],
-            'Version': '12.0',
-            'Accept': 'application / json',
-            'Content-Type': 'application / json'
-        } for x in range(len(confJson["Clients"]))
-    ]
 
     # Read Data of DLL sideloading
-    csvHeaders, csvRows = Utils.getCSVFromFile(FilePath)
+    dllRules = Utils.getFilePathsRecursively(DLLrules, "yml")
+    Data = Utils.getYamlFromFile("I:\\GIT\\CB-Boost\\HijackLibs\\yml\\microsoft\\built-in\\activeds.yml")
 
     # Prepare CB EDR queries
     Results = []
     Queries = []
 
     ## Loop on all configured clients -- No threading
-    for client in confJson["Clients"]:
-        # Create CB headers for all clients
-        CB_headers = {
-                'X-Auth-Token': client["API-Key"],
-                'Version': '12.0',
-                'Accept': 'application / json',
-                'Content-Type': 'application / json'
-            }
-        if client["Enabled"].upper() == "TRUE":
-            for row in csvRows:
-                if row[5].upper() == "TRUE":  # Row[5] is enabled value
-                    DLLSideLoaded = DLLSideLoadedClass.DLLSideLoaded(row)
-                    if DetectSideLoadOpetions == "DLLPath":
-                        Queries.append(DLLSideLoaded.CheckDLLPath())
-                        ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
-                                                                 DLLSideLoaded.CheckDLLPath())
-                        Results.append(ProcessSearch.Search())
-                        del ProcessSearch
-                    elif DetectSideLoadOpetions == "ProcessPath":
-                         Queries.append(DLLSideLoaded.CheckProcessPath())
-                         ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
-                                                                 DLLSideLoaded.CheckProcessPath())
-                         Results.append(ProcessSearch.Search())
-                         del ProcessSearch
-                    else:
-                        Queries.append(DLLSideLoaded.CheckDLLPath())
-                        ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
-                                                                  DLLSideLoaded.CheckDLLPath())
-                        Results.append(ProcessSearch.Search())
-                        del ProcessSearch
-                        Queries.append(DLLSideLoaded.CheckProcessPath())
-                        ProcessSearch = CBAPIendpoints.ProcessSearch(CB_headers, client["URL"],
-                                                                     DLLSideLoaded.CheckProcessPath())
-                        Results.append(ProcessSearch.Search())
-                        del ProcessSearch
-
+    for profile in profiles:
+        cb = CbResponseAPI(profile=profile)
+        for rule in dllRules:
+            DllHijackRule = DllHijackRuleClass.DllHijackRule(Utils.getYamlFromFile(rule))
+            if DetectSideLoadOpetions == "DLLPath":
+                Query = DllHijackRule.CheckDLLPath()
+                if Query == "N/A":
+                    del DllHijackRule
+                    gc.collect()
+                    continue
+                Queries.append(Query)
+                Results.append(cb.select(Process).where(Query))
+                del DllHijackRule
+                gc.collect()
+            elif DetectSideLoadOpetions == "ProcessPath":
+                Results.append(cb.select(Process).where(DllHijackRule.CheckProcessPath()))
+                Queries.append(DllHijackRule.CheckProcessPath())
+                del DllHijackRule
+                gc.collect()
+            else:
+                Queries.append(DllHijackRule.CheckDLLPath())
+                Results.append(cb.select(Process).where(DllHijackRule.CheckDLLPath()))
+                Results.append(cb.select(Process).where(DllHijackRule.CheckProcessPath()))
+                Queries.append(DllHijackRule.CheckProcessPath())
+                del DllHijackRule
+                gc.collect()
+    del cb
     return Queries, Results
 
 def Output(Results, outputPath):
     TotalResults = 0
-    TotalIncomplete = 0
     outputCSVHeader = ['DateTime', 'Sensorid', 'UserName', 'Uniqueid', 'ProcessPath', 'cmdline', 'ProcessMd5',
-                       'ParentName', 'ParentMd5', 'ID in DataSheet', 'Incomplete Query']
+                       'ParentName', 'ParentMd5', 'ID in DataSheet']
     Utils.writeCSVFile(outputPath, "w", outputCSVHeader, "")
     Rows = []
 
     for i in range(len(Results)):
-        TotalResults += Results[i]['total_results']
-        TotalIncomplete += ({True: 1, False: 0}[Results[i]['incomplete_results']])
-        if len(Results[i]['results']) == 0 and Results[i]['incomplete_results'] == True:
-            Rows.append([0, 0, 0, 0, 0, 0, 0, 0, 0, i, Results[i]['incomplete_results']])
-        else:
-            for j in range(len(Results[i]['results'])):
-                Rows.append([Results[i]['results'][j]['start'], Results[i]['results'][j]['sensor_id'],
-                             Results[i]['results'][j]['username'], Results[i]['results'][j]['unique_id'],
-                             Results[i]['results'][j]['path'], Results[i]['results'][j]['cmdline'],
-                             Results[i]['results'][j]['process_md5'],
-                             Results[i]['results'][j]['parent_name'], Results[i]['results'][j]['parent_md5'], i,
-                             Results[i]['incomplete_results']])
+        TotalResults += len(Results[i])
+        for j in range(len(Results[i])):
+            Rows.append([Results[i][j].start.strftime("%m/%d/%Y, %H:%M:%S"), str(Results[i][j].sensor_id),
+                            Results[i][j].username, Results[i][j].unique_id,
+                            Results[i][j].path, Results[i][j].cmdline,
+                            Results[i][j].process_md5,
+                            Results[i][j].parent_name, Results[i][j].parent_md5, str(i)])
+            Utils.writeCSVFile(outputPath, "a", "", Rows)
+            Rows.clear()
 
-    Utils.writeCSVFile(outputPath, "a", "", Rows)
 
     print("Total Processed Queries: " + str(len(Results)))
-    print("Total Incomplete Queries: " + str(TotalIncomplete))
     print("Total Finding: " + str(TotalResults))
