@@ -1,0 +1,3 @@
+[submodule "HijackLibs"]
+	path = HijackLibs
+	url = https://github.com/wietze/HijackLibs
