@@ -51,19 +51,26 @@ def Output(Results, outputPath):
                        'ParentName', 'ParentMd5', 'ID in DataSheet']
     Utils.writeCSVFile(outputPath, "w", outputCSVHeader, "")
     Rows = []
-
+    Exception = []
     for i in range(len(Results)):
-        TotalResults += len(Results[i])
-        if i%5 == 0 : print("{} Queries are executed!".format(i+1))
-        for j in range(len(Results[i])):
-            Rows.append([Results[i][j].start.strftime("%m/%d/%Y, %H:%M:%S"), str(Results[i][j].sensor_id),
-                            Results[i][j].username, Results[i][j].unique_id,
-                            Results[i][j].path, Results[i][j].cmdline,
-                            Results[i][j].process_md5,
-                            Results[i][j].parent_name, Results[i][j].parent_md5, str(i)])
-            Utils.writeCSVFile(outputPath, "a", "", Rows)
-            Rows.clear()
+        try:
+            TotalResults += len(Results[i])
+            if i%5 == 0 :
+                print("{} Queries are executed!".format(i+1))
+                print("Current Resutls: {} ".format(TotalResults))
+            for j in range(len(Results[i])):
+                Rows.append([Results[i][j].start.strftime("%m/%d/%Y, %H:%M:%S"), str(Results[i][j].sensor_id),
+                                Results[i][j].username, Results[i][j].unique_id,
+                                Results[i][j].path, Results[i][j].cmdline,
+                                Results[i][j].process_md5,
+                                Results[i][j].parent_name, Results[i][j].parent_md5, str(i)])
+                Utils.writeCSVFile(outputPath, "a", "", Rows)
+        except Exception as e:
+            print("Exception happend!!!:\n" + str(e) + "\n")
+            Exception.append(str(e))
+        Rows.clear()
 
 
-    print("\nTotal Processed Queries: " + str(len(Results)))
+    print("\nTotal Executed Queries: " + str(len(Results)))
+    print("\nTotal Exceptions: " + str(len(Exception)))
     print("Total Finding: " + str(TotalResults))
