@@ -1,0 +1,48 @@
+%YAML 1.1
+---
+RuleClass: Powershell
+Description: run the following powershell command
+Command:
+CommandPath: #load script from the disk first 
+AssetScope:
+Destination:
+DestinationFormat: #CSV
+ThreadLimit: 2
+---
+RuleClass: CommandPrompt
+Description: run the following command
+Command:
+ScriptPath: #load script from the disk first 
+AssetScope:
+Destination:
+DestinationFormat: #CSV
+ThreadLimit: 2
+---
+RuleClass: DetectHiddenAccounts
+Description: Desc
+AssetScope :  C:\servers.csv #Determine if path or hostname or group number by code (if \ or . then path, if all num then group name, else hostname)
+DateRange: 2022-07-03 ~ 2022-07-05
+Destination: c:\output.csv #identify the output format from the file extension.
+DestinationFormat: #CSV, Json
+ThreadLimit: 10
+---
+RuleClass: DetectDLLHijacking
+Description:
+AssetScope:
+DateRange: 2022-07-03 ~ 2022-07-05
+DLLRules: #Path to YAML folder (HijackLib format)
+Destination:
+DestinationFormat: #CSV, Json
+ThreadLimit: 2
+---
+RuleClass: GetActivity
+description: get activity associated with processes
+processQuery: process_name:msiexec.exe and -(parent_name:services.exe AND cmdline:*/x*)
+startDateTime: "2022-11-01T00:00:00Z" #Format: 2022-11-01T00:00:00Z
+endDateTime: "2022-11-15T00:00:00Z" #Format: 2022-11-15T00:00:00Z 
+requiredActivities: #Network,DLL,File,Registry,CrossProc
+  - Network
+  - File 
+destination: c:\temp\test.csv #File path
+destinationFormat: csv #CSV, Json
+threadLimit: 8 #Maximum 10

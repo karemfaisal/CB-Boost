@@ -3,3 +3,4 @@ venv/**
 __pycache__/**
 CB-X.conf
 Output-DLLSideLoad.csv
+RulesX.yml

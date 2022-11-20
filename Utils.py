@@ -29,8 +29,16 @@ def writeCSVFile(filePath="",writeMode ="w", Headers = "", Rows=""):
 
 def getYamlFromFile(filePath):
     with open(filePath, "r") as file:
-        return yaml.safe_load(file.read())
+        return yaml.safe_load_all(file.read())
 
 def getFilePathsRecursively(folderPath, extension):
     print("\nRules Path: " + os.path.join(folderPath, '**\*.') + extension)
     return list(glob.iglob(os.path.join(folderPath, '**/*.') + extension, recursive=True))
+
+def convert_timestamp(datetime_obj):
+    try:
+        ret = datetime_obj.strftime('%Y-%m-%d-%H:%M:%S')
+    except ValueError:
+        ret = '00000000-000000'
+
+    return ret
