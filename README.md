@@ -7,19 +7,28 @@ CB-Boost's IR capabilities is coming soon!.
 
 
 
-
 ## Engine Capabilities
+
+### Threat Hunting
+
+* [x] TimeLine Activity 
+* [ ] Osquery  (bypass the 200 device limitation)
 
 ### Detection uses cases
 * [x] Detect DLL Hijacking [sideLoading/OrderHijacking].
   * [x] Integration with [HijackLibs](https://github.com/wietze/HijackLibs)
   * [x] Detection Based on the DLL Path
   * [x] Detection Based on The Process Path (not recommended)
+* [ ] Detect Hidden Accounts
 
 
 ### Incident response
 
+- [ ] Execute PowerShell/Command Prompt commands
+
 - [ ] Upload & Run executables and retrieve the output. 
+
+  
 
 
 ## How it works?
@@ -39,7 +48,7 @@ CB-Boost's IR capabilities is coming soon!.
 4. Point to the folder contains HijackLibs rules or minimal rules that you want to search for.
 
    ``` bash
-   python3 main.py -DDH DLLPath --DLLrules ".\HijackLibs\yml\microsoft\built-in" -o "output-DLLSearOrderHijacking.csv"
+   python3 main.py --rules rule.yml --profile "default"
    ```
 
    
@@ -50,19 +59,13 @@ python3 main.py -h
 
 ```shell
 [*Output]
-usage: main.py [-h] [-DDH {DLLPath,ProcessPath,All}] [-f FILE] [-dr DLLRULES]
-               [-p PROFILES] [-o OUTPUT]
+usage: main.py [-h] [-r RULES] [-p PROFILES]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -DDH {DLLPath,ProcessPath,All}, --DetectDllHijack {DLLPath,ProcessPath,All}
-                        Detect DLL SideLoading/OrderHijacking attempts
-  -f FILE, --file FILE  Path to the file used
-  -dr DLLRULES, --DLLrules DLLRULES
-                        Path to DLLHijack rules folder
+  -r RULES, --rules RULES
+                        path to the CB-Boost yaml file path
   -p PROFILES, --profiles PROFILES
-                        profiles name for running the API separated by , ex:
+                        profiles name for running the API separated by ',' ex:
                         Karem,Ali
-  -o OUTPUT, --output OUTPUT
-                        Path to the output file)
 ```

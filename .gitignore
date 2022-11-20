@@ -1,6 +1,7 @@
 venv/**
 .idea/**
 __pycache__/**
+**/__pycache__/**
 CB-X.conf
 Output-DLLSideLoad.csv
 RulesX.yml

@@ -42,8 +42,7 @@ class GetActivity():
                      "file_md5", "file_type", "registry_target", "registry_action", "crossproc_source",
                      "crossproc_target", "crossproc_priv", "crossproc_privcode"]
     processes = []
-    Events = []
-    Events.append(outputColumns)
+    Events = [outputColumns]
     step = 0
     mutex = Lock()
 
