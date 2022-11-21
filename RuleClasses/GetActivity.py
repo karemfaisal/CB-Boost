@@ -51,11 +51,12 @@ class GetActivity():
         self.startDateTime = YmlObj['startDateTime']
         self.endDateTime = YmlObj['endDateTime']
         self.requiredActivities.extend(YmlObj['requiredActivities'])
+        for i in range(len(self.requiredActivities)): self.requiredActivities[i] = self.requiredActivities[i].lower()
         self.threadLimit = YmlObj['threadLimit']
         self.destination = YmlObj['destination']
         self.destinationFormat = YmlObj['destinationFormat']
         self.description = YmlObj['description']
-        self.Exporter = exporter
+        self.exporter = exporter
 
     def returnProcesses(self):
         cb = CbResponseAPI(profile=self.CBprofile)
@@ -177,18 +178,55 @@ class GetActivity():
 
     def execute(self):
         self.processes = self.returnProcesses()
-        processesChunks = [x for x in range(0, len(self.processes), math.ceil(len(self.processes) / self.threadLimit))]
-        if len(processesChunks) > 1:
-            self.step = processesChunks[1] - processesChunks[0]
+        processesList = []
+        if "None".lower() in self.requiredActivities:
+            processesList.append((
+                "Last_Update",
+                "hostname",
+                "username",
+                "process_name",
+                "process_pid",
+                "cmdline",
+                "parent_name",
+                "netconn_count",
+                "modload_count",
+                "filemodcount",
+                "scriptload_count",
+                "crossproc_count",
+                "regmod_count",
+                "emet_count"
+            ))
+            for i in range(0,len(self.processes)):
+                processesList.append((
+                    self.processes[i].last_update,
+                    self.processes[i].hostname,
+                    self.processes[i].username,
+                    self.processes[i].process_name,
+                    self.processes[i].process_pid,
+                    self.processes[i].cmdline,
+                    self.processes[i].parent_name,
+                    self.processes[i].netconn_count,
+                    self.processes[i].modload_count,
+                    self.processes[i].filemodcount,
+                    self.processes[i].scriptload_count,
+                    self.processes[i].crossproc_count,
+                    self.processes[i].regmod_count,
+                    self.processes[i].emet_count
+                ))
+            self.exporter.export(self.destination, processesList)
         else:
-            self.step = len(self.processes)
+            processesChunks = [x for x in range(0, len(self.processes), math.ceil(len(self.processes) / self.threadLimit))]
+            if len(processesChunks) > 1:
+                self.step = processesChunks[1] - processesChunks[0]
+            else:
+                self.step = len(self.processes)
 
-        # Execute Thread
-        with ThreadPoolExecutor(self.threadLimit) as executor:
-            futures = [executor.submit(self.getEvents, x) for x in
-                       range(0, len(self.processes), math.ceil(len(self.processes) / self.threadLimit))]
-            done, not_done = wait(futures, return_when=ALL_COMPLETED)
+            # Execute Thread
+            with ThreadPoolExecutor(self.threadLimit) as executor:
+                futures = [executor.submit(self.getEvents, x) for x in
+                           range(0, len(self.processes), math.ceil(len(self.processes) / self.threadLimit))]
+                done, not_done = wait(futures, return_when=ALL_COMPLETED)
 
-        self.exporter.export(self.destination, self.Events)
+            self.exporter.export(self.destination, self.Events)
 
         print("end")
